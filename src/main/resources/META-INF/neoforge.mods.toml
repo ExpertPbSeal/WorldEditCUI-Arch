@@ -1,17 +1,17 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/zbx1425/WorldEditCUI-NF"
+license = "EPL-2.0"
 
 [[mods]]
 modId = "worldeditcui"
 version = "${version}"
 displayName = "WorldEditCUI"
-authors = "Me!"
+authors = "lahwran, yetanotherx, Mumfrey, TomyLobo, mikroskeem, Zbx1425"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+Client-side user interface for WorldEdit (Ported to NeoForge by Zbx1425)
 '''
-#logoFile = ""
+logoFile = "assets/worldeditcui/icon.png"
 
 [[dependencies.worldeditcui]]
 modId = "neoforge"
@@ -25,6 +25,13 @@ modId = "minecraft"
 type = "required"
 versionRange = "[1.21,)"
 ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.worldeditcui]]
+modId = "worldedit"
+type = "optional"
+versionRange = "[7.2.0,)"
+ordering = "AFTER"
 side = "BOTH"
 
 [[mixins]]

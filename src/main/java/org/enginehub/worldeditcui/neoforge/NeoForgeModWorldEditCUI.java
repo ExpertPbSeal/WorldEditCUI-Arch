@@ -18,23 +18,24 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.EventBus;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import org.enginehub.worldeditcui.WorldEditCUI;
 import org.enginehub.worldeditcui.config.CUIConfiguration;
 import org.enginehub.worldeditcui.event.listeners.CUIListenerChannel;
 import org.enginehub.worldeditcui.event.listeners.CUIListenerWorldRender;
+import org.enginehub.worldeditcui.gui.CUIConfigPanel;
 import org.enginehub.worldeditcui.neoforge.mixins.LevelRendererAccessor;
 import org.enginehub.worldeditcui.render.OptifinePipelineProvider;
 import org.enginehub.worldeditcui.render.PipelineProvider;
@@ -42,7 +43,6 @@ import org.enginehub.worldeditcui.render.VanillaPipelineProvider;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -89,7 +89,7 @@ public final class NeoForgeModWorldEditCUI {
         return new KeyMapping("key." + MOD_ID + '.' + name, type, code, KEYBIND_CATEGORY_WECUI);
     }
 
-    public NeoForgeModWorldEditCUI(EventBus eventBus) {
+    public NeoForgeModWorldEditCUI(IEventBus eventBus, ModContainer container) {
         if (Boolean.getBoolean("wecui.debug.mixinaudit")) {
             MixinEnvironment.getCurrentEnvironment().audit();
         }
@@ -100,6 +100,8 @@ public final class NeoForgeModWorldEditCUI {
             eventBus.register(ModEventBusListener.class);
             eventBus.register(CUINetworking.class);
             NeoForge.EVENT_BUS.register(ForgeEventBusListener.class);
+            container.registerExtensionPoint(IConfigScreenFactory.class, (mc, parent) ->
+                new CUIConfigPanel(parent, instance.getController().getConfiguration()));
         }
     }
 
@@ -111,6 +113,11 @@ public final class NeoForgeModWorldEditCUI {
             event.register(instance.keyBindClearSel);
             event.register(instance.keyBindToggleUI);
         }
+
+        @SubscribeEvent
+        private static void onClientLifecycleClientStarted(FMLClientSetupEvent event) {
+            instance.onGameInitDone(Minecraft.getInstance());
+        }
     }
 
     private static class ForgeEventBusListener {
@@ -118,11 +125,6 @@ public final class NeoForgeModWorldEditCUI {
         @SubscribeEvent
         private static void onClientTickEnd(ClientTickEvent.Post event) {
             instance.onTick(Minecraft.getInstance());
-        }
-
-        @SubscribeEvent
-        private static void onClientLifecycleClientStarted(FMLClientSetupEvent event) {
-            instance.onGameInitDone(Minecraft.getInstance());
         }
 
         @SubscribeEvent
@@ -145,13 +147,15 @@ public final class NeoForgeModWorldEditCUI {
                         RenderSystem.getModelViewStack().popMatrix();
                     }
                 }
-            } else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) { // TODO is this right?
+            } else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) { // TODO is this right?
                 if (((LevelRendererAccessor)event.getLevelRenderer()).getTransparencyChain() == null) {
                     try {
+                        RenderSystem.depthMask(true);
                         RenderSystem.getModelViewStack().pushMatrix();
                         RenderSystem.getModelViewStack().mul(event.getPoseStack().last().pose());
                         RenderSystem.applyModelViewMatrix();
                         instance.onPostRenderEntities(event.getPartialTick());
+                        RenderSystem.depthMask(false);
                     } finally {
                         RenderSystem.getModelViewStack().popMatrix();
                         RenderSystem.applyModelViewMatrix();
