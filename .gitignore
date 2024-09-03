@@ -1,0 +1,35 @@
+# JVM crash related
+core.*
+hs_err_pid*
+
+# IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+/bin/
+/*/bin/
+/*.launch
+/*/*.launch
+
+# Maven
+target/
+dependency-reduced-pom.xml
+
+# Gradle
+!gradle-wrapper.jar
+.gradle/
+/build/
+*/build/
+
+# Fabric stuff
+/run/
+
+# OS X quirks
+.DS_Store

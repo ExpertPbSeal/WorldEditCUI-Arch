@@ -16,6 +16,7 @@ import org.enginehub.worldeditcui.render.LineStyle;
 import org.enginehub.worldeditcui.render.RenderSink;
 import org.enginehub.worldeditcui.render.RenderStyle;
 import org.enginehub.worldeditcui.util.Vector3;
+import org.joml.Matrix4fStack;
 
 import java.util.function.Consumer;
 
@@ -32,7 +33,7 @@ public final class CUIRenderContext implements RenderSink {
         return this.cameraPos;
     }
 
-    public PoseStack poseStack() {
+    public Matrix4fStack poseStack() {
         return RenderSystem.getModelViewStack();
     }
 

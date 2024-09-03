@@ -52,7 +52,7 @@ public class CUIEventPoint3D extends CUIEvent
 		{
 			Minecraft mc = Minecraft.getInstance();
 			Entity entity = mc.getCameraEntity();
-			double hitDistance = mc.gameMode.getPickRange();
+			double hitDistance = mc.gameMode.getDestroyStage();
 			
 			selection.setCuboidVertexLatch(id, entity, Math.min(Math.max(this.getDouble(4), hitDistance), 256.0));
 			this.controller.getDebugger().debug("Setting vertex latch #" + id);
