@@ -91,7 +91,11 @@ final class CUINetworking {
                                     buffer -> new ClientCuiPacket(buffer.readCharSequence(buffer.readableBytes(), StandardCharsets.UTF_8).toString())
                             ),
                             (payload, context) -> {
-
+                                if (context.player() instanceof ServerPlayer) {
+                                    // Server-side packet, let WE handle it
+                                    return;
+                                }
+                                NeoForgeModWorldEditCUI.getInstance().onPluginMessage(payload.text());
                             }
                     );
         }
