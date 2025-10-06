@@ -166,6 +166,7 @@ public final class NeoForgeModWorldEditCUI {
     }
 
     private void onTick(final Minecraft mc) {
+        if (this.controller == null) return;
         final CUIConfiguration config = this.controller.getConfiguration();
         final boolean inGame = mc.player != null;
         final boolean clock = mc.getTimer().getGameTimeDeltaPartialTick(true) > 0;
@@ -190,7 +191,7 @@ public final class NeoForgeModWorldEditCUI {
             }
         }
 
-        if (inGame && clock && this.controller != null) {
+        if (inGame && clock) {
             if (mc.level != this.lastWorld || mc.player != this.lastPlayer) {
                 this.lastWorld = mc.level;
                 this.lastPlayer = mc.player;
