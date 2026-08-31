@@ -8,6 +8,7 @@
 name: Build and Upload to Release
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
